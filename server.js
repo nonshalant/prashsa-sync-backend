@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+
+// Routes
 const patientsRoutes = require("./routes/patients");
 const otpVerificationRoutes = require("./routes/otpVerification");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,16 +14,12 @@ const port = process.env.PORT || 3001;
 app.use(express.json());
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://70f3-2600-4040-986a-3700-108b-e427-45df-e26e.ngrok-free.app",
-    ],
+    origin: "http://localhost:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 app.options("*", cors());
 
@@ -31,6 +29,7 @@ app.get("/", (req, res) => {
 });
 
 // Use Routes
+app.use(bodyParser.json());
 app.use("/patients", patientsRoutes);
 app.use("/otpVerification", otpVerificationRoutes);
 
