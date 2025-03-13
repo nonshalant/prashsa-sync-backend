@@ -30,19 +30,21 @@ app.get("/", (req, res) => {
 });
 
 // Use Routes
-app.use(bodyParser.json());
 app.use("/patients", patientsRoutes);
 app.use("/otpVerification", otpVerificationRoutes);
 
 // Handle 404 Errors
 app.use((req, res, next) => {
-  res.status(404).json({ message: "Route not found" });
+  const error = new Error("Route not found");
+  error.status = 404;
+  next(error);
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Something went wrong!" });
+  res.status(err.status || 500).json({
+    message: err.message || "Something went wrong!",
+  });
 });
 
 // Start Server
