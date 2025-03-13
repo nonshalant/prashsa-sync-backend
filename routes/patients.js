@@ -40,6 +40,44 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Mock Register route
+const mockDB = [];
+
+router.post("/mock-register", async (req, res) => {
+  const { email, first_name, last_name, password } = req.body;
+  try {
+    const patientCheck = mockDB.find(patient => patient.email === email);
+    if (patientCheck) {
+      return res.status(400).json({ error: "Email already exists" });
+    } else {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const newPatient = {
+        id: mockDB.length + 1,
+        email,
+        first_name,
+        last_name,
+        password: hashedPassword,
+      };
+      mockDB.push(newPatient);
+
+      const token = jwt.sign({ id: newPatient.id }, JWT_SECRET);
+      res.status(201).json({
+        message: "Account created successfully!",
+        token,
+        user: {
+          id: newPatient.id,
+          email: newPatient.email,
+          first_name: newPatient.first_name,
+          last_name: newPatient.last_name,
+        },
+      });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // Login route
 router.post("/login", async (req, res) => {});
 
