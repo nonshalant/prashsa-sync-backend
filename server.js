@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const authRoutes = require("./routes/auth");
-const otpVerificationRoutes = require("./routes/OtpVerification");
+const patientsRoutes = require("./routes/patients");
+const otpVerificationRoutes = require("./routes/otpVerification");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 });
 
 // Use Routes
-app.use("/auth", authRoutes);
+app.use("/patientsRoutes", patientsRoutes);
 app.use("/otpVerification", otpVerificationRoutes);
 
 // Handle 404 Errors
