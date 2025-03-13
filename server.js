@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 });
 
 // Use Routes
-app.use("/patientsRoutes", patientsRoutes);
+app.use("/patients", patientsRoutes);
 app.use("/otpVerification", otpVerificationRoutes);
 
 // Handle 404 Errors
