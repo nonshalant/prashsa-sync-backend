@@ -17,9 +17,10 @@ router.post("/send-otp", async (req, res) => {
   }
 
   try {
-    await client.verify.v2
+    client.verify.v2
       .services(serviceId)
-      .verifications.create({ to: phoneNumber, channel: "sms" });
+      .verifications.create({ to: phoneNumber, channel: "sms" })
+      .then((verification) => console.log(verification.sid));
 
     res.status(200).json({
       message: "OTP sent successfully",
