@@ -19,7 +19,7 @@ router.post("/send-otp", async (req, res) => {
   try {
     const verification = await client.verify.v2
       .services(serviceId)
-      .verifications.create({ to: phoneNumber, channel: "sms" });
+      .verifications.create({ to: `+1${phoneNumber}`, channel: "sms" });
 
     console.log("OTP Sent. Verification SID:", verification.sid);
 
@@ -35,14 +35,24 @@ router.post("/send-otp", async (req, res) => {
   }
 });
 
-module.exports = router;
-
-router.post("/verify-otp", (req, res) => {
-  const { otp } = req.body;
-  if (req.session.otp === otp) {
-    res.status(200).send("OTP verified successfully");
-  } else {
-    res.status(400).send("Invalid OTP");
+router.post("/verify-code", async (req, res) => {
+  const { phoneNumber, verificationCode } = req.body;
+    req.body.accountCredentials;
+  try {
+    const verificationCheck = await client.verify.v2
+      .services(serviceId)
+      .verificationChecks.create({
+        to: `+1${phoneNumber}`,
+        code: verificationCode,
+      });
+    if (verificationCheck.status === "approved") {
+      res.status(200).json({ message: "Phone number verified" });
+    } else {
+      res.status(400).json({ message: "Invalid verification code" });
+    }
+  } catch (error) {
+    console.error("Error verifying code:", error);
+    res.status(500).json({ message: "Could not verify code" });
   }
 });
 
