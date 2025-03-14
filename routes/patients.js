@@ -46,7 +46,7 @@ const mockDB = [];
 router.post("/mock-register", async (req, res) => {
   const { email, first_name, last_name, password } = req.body;
   try {
-    const patientCheck = mockDB.find(patient => patient.email === email);
+    const patientCheck = mockDB.find((patient) => patient.email === email);
     if (patientCheck) {
       return res.status(400).json({ error: "Email already exists" });
     } else {
