@@ -5,21 +5,37 @@ const router = express.Router();
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = new twilio(accountSid, authToken);
+const serviceId = process.env.TWILIO_OTP_VERIFICATION_SERVICE_ID;
+
+const client = twilio(accountSid, authToken);
 
 router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;
+
+  if (!phoneNumber) {
+    return res.status(400).json({ message: "Phone number is required" });
+  }
+
   try {
-    await client.verify.v2
-      .services(process.env.TWILIO_OTP_VERIFICATION_SERIVCE_ID)
-      .verifications.create({ to: phoneNumber, channel: "sms" })
-      .then((verification) => console.log(verification.sid));
-    req.session.otp = otp;
-    res.status(200).send("OTP sent successfully");
+    const verification = await client.verify.v2
+      .services(serviceId)
+      .verifications.create({ to: phoneNumber, channel: "sms" });
+
+    console.log("OTP Sent. Verification SID:", verification.sid);
+
+    res.status(200).json({
+      message: "OTP sent successfully",
+      sid: verification.sid,
+    });
   } catch (error) {
-    res.status(500).send("Error sending OTP");
+    console.error("Twilio Error:", error);
+    res
+      .status(500)
+      .json({ message: "Error sending OTP", error: error.message });
   }
 });
+
+module.exports = router;
 
 router.post("/verify-otp", (req, res) => {
   const { otp } = req.body;
