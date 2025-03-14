@@ -79,7 +79,34 @@ router.post("/mock-register", async (req, res) => {
 });
 
 // Login route
-router.post("/login", async (req, res) => {});
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const patient = await pool.query("SELECT * FROM patients WHERE email = $1", [email]);
+    if (patient.rows.length === 0) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    const validPassword = await bcrypt.compare(password, patient.rows[0].password);
+    if (!validPassword) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ id: patient.rows[0].id }, JWT_SECRET);
+    res.status(200).json({
+      message: "Login successful!",
+      token,
+      user: {
+        id: patient.rows[0].id,
+        email: patient.rows[0].email,
+        first_name: patient.rows[0].first_name,
+        last_name: patient.rows[0].last_name,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 // Logout route
 router.post("/logout", async (req, res) => {});
