@@ -11,7 +11,7 @@ router.post("/send-otp", async (req, res) => {
   const { phoneNumber } = req.body;
   try {
     await client.verify.v2
-      .services("VA5008c9014baab5729cc603431c8e917a")
+      .services(process.env.TWILIO_OTP_VERIFICATION_SERIVCE_ID)
       .verifications.create({ to: phoneNumber, channel: "sms" })
       .then((verification) => console.log(verification.sid));
     req.session.otp = otp;
